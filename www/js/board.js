@@ -237,6 +237,8 @@ export function renderBoard(container, state, actions) {
             // Blacklist: Karten mit einem dieser Labels ausblenden (neue Labels bleiben sichtbar)
             cards = cards.filter(c => !(c.labels || []).some(l => state.labelFilter.includes(l)));
         }
+        // Zähler = sichtbare Karten des aktiven Filters (vor der doneLimit-Kürzung)
+        const matchedCount = cards.length;
         // In Erledigt-Spalten optional nur die zuletzt erledigten N Karten zeigen
         if (col.isDone && state.doneLimit != null && cards.length > state.doneLimit) {
             cards = cards.slice()
@@ -247,7 +249,9 @@ export function renderBoard(container, state, actions) {
         const head = el('div', 'column-head');
         head.appendChild(el('span', null, col.title));
         const allInCol = board.cards.filter(c => c.columnId === col.id).length;
-        const count = el('span', 'count', col.wipLimit > 0 ? `${allInCol}/${col.wipLimit}` : String(allInCol));
+        // Bei aktivem Personen-/Label-Filter zählt die Kopfzeile die gefilterten (sichtbaren) Karten
+        const anyFilter = (state.filterActive && state.user) || (state.usersFilter && state.usersFilter.length) || (state.labelFilter && state.labelFilter.length);
+        const count = el('span', 'count', (!anyFilter && col.wipLimit > 0) ? `${allInCol}/${col.wipLimit}` : String(anyFilter ? matchedCount : allInCol));
         head.appendChild(count);
         if (col.wipLimit > 0 && allInCol > col.wipLimit) colEl.classList.add('over-wip');
 

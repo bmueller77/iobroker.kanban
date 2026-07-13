@@ -4,6 +4,8 @@ Ein vollwertiges **Kanban-Board als eigener ioBroker-Adapter**. Der Adapter brin
 
 > **Für wen?** Für alle, die im Smart-Home eine gemeinsame Aufgabenverwaltung wollen – Familie, WG, Haustechnik-Wartung – und diese eng mit ioBroker (Skripte, Lovelace, Node-RED) verzahnen möchten.
 
+> **Version 0.1.3** – Fix: Der Aufgaben-Zähler in der Spaltenkopfzeile berücksichtigt den aktiven Personen-/Label-Filter (zeigte vorher die Gesamtzahl der Spalte).
+
 > **Version 0.1.2** – „Ansicht teilen": Labels wirken jetzt als **Blacklist** (Auswahl blendet aus, neue Labels bleiben sichtbar); `doneLimit` unterscheidet **leer = alle** und **`0` = keine**.
 
 > **Version 0.1.1** – Sicherheits-Update: Schreibschutz der REST-API per Token (`X-Kanban-Token`), vor XSS bereinigte Markdown-Vorschau, nur sichere Link-Schemata und eine Content-Security-Policy. Details unter [Sicherheit & Zugriffsschutz](#sicherheit--zugriffsschutz).

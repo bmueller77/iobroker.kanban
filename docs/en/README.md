@@ -4,6 +4,8 @@ A full-featured **Kanban board as a dedicated ioBroker adapter**. The adapter sh
 
 > **Who is it for?** Anyone who wants shared task management in their smart home – family, flat-share, house maintenance – tightly integrated with ioBroker (scripts, Lovelace, Node-RED).
 
+> **Version 0.1.3** – Fix: the column task count now respects the active person/label filter (previously showed the column total).
+
 > **Version 0.1.2** – "Share view": labels now act as a **blacklist** (selection hides them, new labels stay visible); `doneLimit` distinguishes **empty = all** from **`0` = none**.
 
 > **Version 0.1.1** – security update: write protection for the REST API via token (`X-Kanban-Token`), XSS-sanitized Markdown preview, safe link schemes only, and a Content Security Policy. See [Security & access control](#security--access-control).

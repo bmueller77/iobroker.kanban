@@ -1,6 +1,6 @@
 {
   "name": "iobroker.kanban",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Kanban board for ioBroker with webhooks, multi-user support and email notifications",
   "author": {
     "name": "Björn Müller"
