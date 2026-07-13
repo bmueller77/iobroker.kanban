@@ -1,0 +1,43 @@
+{
+  "name": "iobroker.kanban",
+  "version": "0.1.2",
+  "description": "Kanban board for ioBroker with webhooks, multi-user support and email notifications",
+  "author": {
+    "name": "Björn Müller"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bmueller77/iobroker.kanban.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bmueller77/iobroker.kanban/issues"
+  },
+  "homepage": "https://github.com/bmueller77/iobroker.kanban#readme",
+  "keywords": [
+    "ioBroker",
+    "kanban",
+    "board",
+    "tasks"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.2.2",
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  },
+  "main": "main.js",
+  "files": [
+    "admin/",
+    "lib/",
+    "www/",
+    "io-package.json",
+    "main.js",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node main.js"
+  }
+}

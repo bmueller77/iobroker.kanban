@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Content-Security-Policy: unterbindet Inline-/Fremd-Skripte (Defense-in-Depth gegen XSS).
+     Als <meta> gesetzt → 'frame-ancestors' entfällt bewusst, damit die iframe-Einbindung (Lovelace) frei bleibt. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: http: https:; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'self'">
+<title>Kanban</title>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="api/custom.css">
+<script src="vendor/sortable.min.js"></script>
+<script src="vendor/marked.min.js"></script>
+<script src="vendor/purify.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<header id="topbar">
+    <select id="boardSelect" data-i18n-title="topbar.selectBoard"></select>
+    <div id="userChips" data-i18n-title="topbar.activeUser"></div>
+    <button id="filterBtn" class="iconbtn" data-i18n-title="topbar.filterMine">&#9776;</button>
+    <span class="spacer"></span>
+    <button id="addCardBtn" class="primary" data-i18n="topbar.addCard">+ Karte</button>
+    <button id="themeBtn" class="iconbtn" data-i18n-title="topbar.theme">&#9681;</button>
+    <button id="shareBtn" class="iconbtn" data-i18n-title="topbar.share">&#128279;</button>
+    <button id="settingsBtn" class="iconbtn" data-i18n-title="topbar.settings">&#9881;</button>
+</header>
+<main id="board"><div class="empty" data-i18n="board.loading">Lade&hellip;</div></main>
+
+<dialog id="cardDialog">
+    <form method="dialog" id="cardForm">
+        <h3 id="cardDialogTitle">Karte</h3>
+        <label data-i18n="card.title">Titel
+            <input type="text" name="title" required autocomplete="off">
+        </label>
+        <label><span data-i18n="card.description">Beschreibung</span> <span class="hint" data-i18n="card.markdown">(Markdown)</span>
+            <textarea name="description" rows="4"></textarea>
+        </label>
+        <div id="descPreview" class="md-preview" hidden></div>
+        <div class="row">
+            <label data-i18n="card.dueDate">Fällig am
+                <input type="date" name="due">
+            </label>
+            <label class="inline" id="dueTimeToggleWrap" data-i18n-title="card.timeToggleTitle">
+                <input type="checkbox" name="dueTimeEnabled"> <span data-i18n="card.time">Uhrzeit</span>
+            </label>
+            <label id="dueTimeWrap" hidden data-i18n="card.time">Uhrzeit
+                <input type="time" name="dueTime">
+            </label>
+            <label data-i18n="card.priority">Priorität
+                <select name="priority">
+                    <option value="0" data-i18n="prio.normal">Normal</option>
+                    <option value="1" data-i18n="prio.high">Hoch</option>
+                    <option value="2" data-i18n="prio.urgent">Dringend</option>
+                </select>
+            </label>
+            <label data-i18n="card.column">Spalte
+                <select name="columnId"></select>
+            </label>
+        </div>
+        <label data-i18n="card.assignees">Zuständig</label>
+        <div id="assigneePick" class="chip-pick"></div>
+        <label data-i18n="card.labels">Labels</label>
+        <div id="labelPick" class="chip-pick"></div>
+        <div class="row">
+            <label data-i18n="card.color">Kartenfarbe
+                <div id="colorPick" class="color-pick"></div>
+            </label>
+            <label data-i18n="card.link">Link
+                <input type="url" name="link" placeholder="https://&hellip;">
+            </label>
+        </div>
+        <label data-i18n="card.location">Ort
+            <input type="text" name="location" data-i18n-ph="card.locationPlaceholder" placeholder="z.B. Rathaus, Musterstr. 1">
+        </label>
+        <label class="inline" data-i18n-title="card.calendarInviteTitle">
+            <input type="checkbox" name="calendarInvite"> <span data-i18n="card.calendarInvite">Kalender-Einladung (.ics) an Benachrichtigung anhängen</span>
+        </label>
+        <label data-i18n="card.recurrence">Wiederholung</label>
+        <div class="row">
+            <label data-i18n="rec.rhythm">Rhythmus
+                <select name="recType" id="recType">
+                    <option value="none" data-i18n="rec.none">Keine</option>
+                    <option value="daily" data-i18n="rec.daily">Täglich</option>
+                    <option value="weekly" data-i18n="rec.weekly">Wöchentlich</option>
+                    <option value="monthly" data-i18n="rec.monthly">Monatlich (Tag im Monat)</option>
+                    <option value="monthly_weekday" data-i18n="rec.monthlyWeekday">Monatlich (Wochentag)</option>
+                    <option value="workday" data-i18n="rec.workday">Arbeitstag im Monat</option>
+                    <option value="yearly" data-i18n="rec.yearly">Jährlich</option>
+                    <option value="every_n_days" data-i18n="rec.everyNDays">Alle X Tage</option>
+                </select>
+            </label>
+            <label id="recIntervalWrap" hidden data-i18n="rec.interval">Intervall (Tage)
+                <input type="number" name="recInterval" min="1" value="2">
+            </label>
+            <label id="recDomWrap" hidden data-i18n="rec.dayOfMonth">Tag im Monat
+                <input type="number" name="recDom" min="1" max="31" value="1">
+            </label>
+            <label id="recMonthWrap" hidden data-i18n="rec.month">Monat
+                <select name="recMonth"></select>
+            </label>
+            <label id="recOrdinalWrap" hidden data-i18n="rec.which">Welcher
+                <select name="recOrdinal">
+                    <option value="1">1.</option><option value="2">2.</option>
+                    <option value="3">3.</option><option value="4">4.</option>
+                    <option value="-1" data-i18n="rec.ordinalLast">letzter</option>
+                </select>
+            </label>
+            <label id="recWorkdayPosWrap" hidden data-i18n="rec.position">Position
+                <select name="recWorkdayPos">
+                    <option value="first" data-i18n="wd.first">erster</option>
+                    <option value="last" data-i18n="wd.last">letzter</option>
+                    <option value="nth" data-i18n="wd.nth">n-ter (von vorn)</option>
+                    <option value="nth_last" data-i18n="wd.nthLast">n-ter (von hinten)</option>
+                </select>
+            </label>
+            <label id="recWorkdayNWrap" hidden data-i18n="rec.n">n
+                <input type="number" name="recWorkdayN" min="1" max="23" value="1">
+            </label>
+        </div>
+        <div id="recWeekdayWrap" class="chip-pick" hidden></div>
+        <div id="recHint" class="hint" hidden></div>
+
+        <label data-i18n="card.checklist">Checkliste</label>
+        <div id="checklistEdit"></div>
+        <button type="button" id="addCheckItem" class="linkbtn" data-i18n="card.addCheckItem">+ Punkt hinzufügen</button>
+        <footer>
+            <button type="button" id="deleteCardBtn" class="danger" hidden data-i18n="card.delete">Löschen</button>
+            <span class="spacer"></span>
+            <button type="button" value="cancel" id="cancelCardBtn" data-i18n="card.cancel">Abbrechen</button>
+            <button type="submit" class="primary" id="saveCardBtn" data-i18n="card.save">Speichern</button>
+        </footer>
+    </form>
+</dialog>
+
+<dialog id="boardDialog">
+    <div id="boardDialogBody"></div>
+</dialog>
+<dialog id="shareDialog">
+    <div id="shareBody"></div>
+</dialog>
+</body>
+</html>

@@ -1,0 +1,176 @@
+{
+  "common": {
+    "name": "kanban",
+    "version": "0.1.2",
+    "title": "Kanban Board",
+    "titleLang": {
+      "en": "Kanban Board",
+      "de": "Kanban Board"
+    },
+    "desc": {
+      "en": "Kanban board with own web server, webhooks, multi-user support and email notifications",
+      "de": "Kanban-Board mit eigenem Webserver, Webhooks, Multiuser-Support und E-Mail-Benachrichtigungen"
+    },
+    "authors": [
+      "Björn Müller"
+    ],
+    "platform": "Javascript/Node.js",
+    "mode": "daemon",
+    "compact": true,
+    "messagebox": true,
+    "readme": "https://github.com/bmueller77/iobroker.kanban",
+    "icon": "kanban.png",
+    "extIcon": "https://raw.githubusercontent.com/bmueller77/iobroker.kanban/main/admin/kanban.png",
+    "enabled": true,
+    "adminUI": {
+      "config": "json"
+    },
+    "localLinks": {
+      "_default": {
+        "link": "http://%ip%:%native_port%/",
+        "name": "Kanban",
+        "color": "#7E57C2",
+        "intro": true
+      }
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "news": {
+      "0.1.2": {
+        "en": "Share dialog: doneLimit distinguishes empty=all and 0=none; label filter is now a blacklist (new labels stay visible)",
+        "de": "Teilen-Dialog: doneLimit unterscheidet leer=alle und 0=keine; Label-Filter jetzt Blacklist (neue Labels bleiben sichtbar)"
+      },
+      "0.1.1": {
+        "en": "Security: token-protected write API, sanitized markdown preview, CSP, safe link schemes",
+        "de": "Sicherheit: tokengeschützte Schreib-API, bereinigte Markdown-Vorschau, CSP, sichere Link-Schemata"
+      },
+      "0.1.0": {
+        "en": "Initial release",
+        "de": "Erstveröffentlichung"
+      }
+    }
+  },
+  "native": {
+    "port": 8095,
+    "bind": "0.0.0.0",
+    "users": [
+      {
+        "name": "user1",
+        "displayName": "User 1",
+        "email": "",
+        "color": "#7E57C2",
+        "icon": "mdi:account"
+      },
+      {
+        "name": "user2",
+        "displayName": "User 2",
+        "email": "",
+        "color": "#26A69A",
+        "icon": "mdi:account"
+      }
+    ],
+    "inboundTokens": [],
+    "outboundWebhooks": [],
+    "emailInstance": "email.0",
+    "emailFrom": "",
+    "notifyAssigned": true,
+    "notifyDue": true,
+    "notifyCreated": false,
+    "notifyMoved": false,
+    "notifyDone": false,
+    "reminderTime": "08:00",
+    "reminderDaysBefore": 1,
+    "publicUrl": "",
+    "themeDefault": "auto",
+    "accentColor": "#7E57C2",
+    "customCss": "",
+    "language": "",
+    "notifyUpdated": false,
+    "apiWriteProtection": true
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "",
+      "type": "meta",
+      "common": {
+        "name": {
+          "en": "Kanban files (avatars)",
+          "de": "Kanban-Dateien (Avatare)"
+        },
+        "type": "meta.user"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Info"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "name": "Web server running",
+        "type": "boolean",
+        "role": "indicator.connected",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    },
+    {
+      "_id": "action",
+      "type": "state",
+      "common": {
+        "name": "Command input (JSON, same commands as sendTo/webhook)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": true,
+        "def": ""
+      },
+      "native": {}
+    },
+    {
+      "_id": "lastEvent",
+      "type": "state",
+      "common": {
+        "name": "Last board event (JSON)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    },
+    {
+      "_id": "boards",
+      "type": "channel",
+      "common": {
+        "name": "Boards"
+      },
+      "native": {}
+    },
+    {
+      "_id": "users",
+      "type": "channel",
+      "common": {
+        "name": "Users"
+      },
+      "native": {}
+    }
+  ]
+}

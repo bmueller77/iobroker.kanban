@@ -1,0 +1,107 @@
+{
+  "_comment": "Werkzeug-Definitionen für einen LLM-Agenten (Hermes), um das ioBroker-Kanban-Board zu lesen und zu schreiben. Alle Tools rufen POST http://<HOST>:8095/webhook/<TOKEN>/action mit dem jeweiligen Body auf. Feldnamen-Fallstricke: Karten-ID = cardId ODER id; Spalte = columnId ODER column; Board = board ODER boardId.",
+  "endpoint": "POST http://172.30.0.40:8095/webhook/<TOKEN>/action",
+  "tools": [
+    {
+      "name": "kanban_get_boards",
+      "description": "Liste aller Kanban-Boards (id, Titel, Kartenanzahl).",
+      "body": { "cmd": "getBoards" }
+    },
+    {
+      "name": "kanban_get_board",
+      "description": "Ein Board komplett lesen: Spalten, Labels und alle Karten mit allen Feldern.",
+      "parameters": {
+        "type": "object",
+        "properties": { "boardId": { "type": "string", "description": "Board-ID, z.B. 'familie'" } },
+        "required": ["boardId"]
+      },
+      "body_template": { "cmd": "getBoard", "boardId": "{boardId}" }
+    },
+    {
+      "name": "kanban_add_card",
+      "description": "Neue Karte anlegen. Nur title und board sind Pflicht; alles andere optional.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "board": { "type": "string", "description": "Board-ID" },
+          "title": { "type": "string" },
+          "columnId": { "type": "string", "description": "Zielspalte; leer = erste Spalte" },
+          "description": { "type": "string", "description": "Markdown erlaubt" },
+          "due": { "type": "string", "description": "Fälligkeit YYYY-MM-DD" },
+          "dueTime": { "type": "string", "description": "Uhrzeit HH:MM (nur mit due)" },
+          "assignees": { "type": "array", "items": { "type": "string" }, "description": "Benutzer-IDs (name)" },
+          "labels": { "type": "array", "items": { "type": "string" }, "description": "Label-IDs" },
+          "priority": { "type": "integer", "enum": [0, 1, 2], "description": "0 normal, 1 hoch, 2 dringend" },
+          "location": { "type": "string" },
+          "link": { "type": "string" },
+          "calendarInvite": { "type": "boolean", "description": "ICS-Anhang bei Benachrichtigung (nur mit due)" }
+        },
+        "required": ["board", "title"]
+      },
+      "body_template": { "cmd": "addCard" }
+    },
+    {
+      "name": "kanban_update_card",
+      "description": "Bestehende Karte ändern. Nur die zu ändernden Felder mitschicken.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "board": { "type": "string" },
+          "cardId": { "type": "string", "description": "ID der Karte" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "due": { "type": "string" },
+          "dueTime": { "type": "string" },
+          "assignees": { "type": "array", "items": { "type": "string" } },
+          "labels": { "type": "array", "items": { "type": "string" } },
+          "priority": { "type": "integer", "enum": [0, 1, 2] },
+          "location": { "type": "string" },
+          "link": { "type": "string" },
+          "calendarInvite": { "type": "boolean" }
+        },
+        "required": ["board", "cardId"]
+      },
+      "body_template": { "cmd": "updateCard" }
+    },
+    {
+      "name": "kanban_move_card",
+      "description": "Karte in eine andere Spalte verschieben.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "board": { "type": "string" },
+          "cardId": { "type": "string" },
+          "columnId": { "type": "string", "description": "Ziel-Spalten-ID" }
+        },
+        "required": ["board", "cardId", "columnId"]
+      },
+      "body_template": { "cmd": "moveCard" }
+    },
+    {
+      "name": "kanban_done_card",
+      "description": "Karte als erledigt markieren (verschiebt sie in die Erledigt-Spalte, löst ggf. Wiederholung aus).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "board": { "type": "string" },
+          "cardId": { "type": "string" }
+        },
+        "required": ["board", "cardId"]
+      },
+      "body_template": { "cmd": "doneCard" }
+    },
+    {
+      "name": "kanban_delete_card",
+      "description": "Karte löschen. ACHTUNG: Feld heißt hier 'id', nicht 'cardId'.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "board": { "type": "string" },
+          "id": { "type": "string", "description": "ID der Karte" }
+        },
+        "required": ["board", "id"]
+      },
+      "body_template": { "cmd": "deleteCard" }
+    }
+  ]
+}

@@ -1,0 +1,609 @@
+/* ioBroker Kanban — Theming über CSS-Custom-Properties, data-theme am <html> */
+
+:root {
+    --accent: #7E57C2;
+    --bg: #f2f2f5;
+    --surface: #ffffff;
+    --surface2: #e9e9ee;
+    --text: #1c1c1e;
+    --muted: #71717a;
+    --border: #d4d4d8;
+    --danger: #d32f2f;
+    --warn: #ef6c00;
+    --shadow: 0 1px 3px rgba(0, 0, 0, .12);
+    --radius: 10px;
+}
+
+html[data-theme="dark"] {
+    --bg: #16161a;
+    --surface: #232329;
+    --surface2: #2d2d35;
+    --text: #ececf0;
+    --muted: #9d9da8;
+    --border: #3c3c46;
+    --shadow: 0 1px 3px rgba(0, 0, 0, .5);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+}
+
+body { display: flex; flex-direction: column; }
+
+/* ------------------------------------------------------------ Kopfzeile */
+
+#topbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+body.embed #topbar { display: none; }
+
+.spacer { flex: 1; }
+
+#boardSelect {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    max-width: 40vw;
+}
+
+button {
+    font: inherit;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+button:hover { background: var(--surface2); }
+
+button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+}
+
+button.primary:hover { filter: brightness(1.1); background: var(--accent); }
+
+button.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
+
+button.iconbtn { padding: 6px 10px; font-size: 16px; line-height: 1; }
+button.iconbtn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+button.linkbtn {
+    border: none;
+    background: none;
+    color: var(--accent);
+    padding: 4px 0;
+    text-align: left;
+}
+
+/* Benutzer-Chips */
+
+#userChips { display: flex; gap: 4px; align-items: center; }
+
+.user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px 3px 4px;
+    cursor: pointer;
+    background: var(--surface);
+    user-select: none;
+}
+
+.user-chip .avatar { width: 22px; height: 22px; font-size: 11px; }
+
+.user-chip.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    flex: none;
+    overflow: hidden;
+}
+img.avatar, .avatar img { object-fit: cover; width: 100%; height: 100%; border-radius: 50%; }
+
+/* Avatar-Verwaltung im Einstellungen-Dialog */
+.avatar-edit { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.avatar-edit .avatar-prev { width: 32px; height: 32px; font-size: 13px; }
+.avatar-edit .avatar-name { flex: 1; font-size: 14px; }
+
+/* ------------------------------------------------------------ Board */
+
+#board {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    overflow-x: auto;
+    align-items: flex-start;
+}
+
+.empty { color: var(--muted); padding: 24px; }
+
+.column {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    min-width: 280px;
+    max-width: 640px;
+    flex: 1 1 280px;   /* wächst auf breiten Screens mit, scrollt bei vielen Spalten */
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.column-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px 6px;
+    font-weight: 700;
+}
+
+.column-head .count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 1px 8px;
+}
+
+.column.over-wip .column-head, .column.over-wip .count { color: var(--danger); }
+
+.cards {
+    padding: 4px 8px 8px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 24px;
+}
+
+.column-foot { padding: 0 8px 10px; }
+
+.card {
+    position: relative;
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 8px 10px;
+    cursor: grab;
+    border-left: 4px solid transparent;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Checklisten-Aufklappbutton (Chevron) oben rechts in der Karte */
+.card-check-toggle {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--muted);
+    cursor: pointer;
+    opacity: 0.8;
+}
+.card-check-toggle:hover { opacity: 1; color: var(--accent); background: var(--surface2); }
+.card.has-check .title { padding-right: 30px; }   /* Platz für den Chevron */
+
+/* Ausgeklappte Checkliste unter dem Karteninhalt */
+.card-checklist { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+.card-checklist[hidden] { display: none; }   /* [hidden] muss das display:flex schlagen */
+.card-check-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 1px 0;
+}
+.card-check-item input { flex: none; }
+.card-check-item.done .card-check-text { text-decoration: line-through; color: var(--muted); }
+
+.card.dragging, .sortable-ghost { opacity: .5; }
+
+.card .title { font-weight: 600; overflow-wrap: anywhere; }
+
+.card .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.badge {
+    font-size: 12px;
+    border-radius: 6px;
+    padding: 1px 6px;
+    background: var(--surface2);
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.badge.date-badge { color: var(--text); font-weight: 500; }
+.badge.due-overdue { background: var(--danger); color: #fff; }
+a.link-badge {
+    text-decoration: none;
+    cursor: pointer;
+    color: inherit;
+    border: 1px solid rgba(127, 127, 127, 0.55);
+}
+a.link-badge:hover {
+    background: var(--accent, #7E57C2);
+    color: #fff;
+}
+/* Dark Mode: dunkle Emojis (z.B. Telefon) als helle Silhouette rendern,
+   Badge-Rahmen deutlich sichtbar */
+html[data-theme="dark"] a.link-badge {
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.10);
+    filter: grayscale(1) brightness(0) invert(1) opacity(0.92);
+}
+html[data-theme="dark"] a.link-badge:hover {
+    filter: none;
+    background: var(--accent, #7E57C2);
+}
+.badge.due-soon { background: var(--warn); color: #fff; }
+.badge.due-done { background: #2e7d32; color: #fff; }   /* erledigt → grün */
+.badge.prio-1 { background: var(--warn); color: #fff; font-weight: 700; }
+.badge.prio-2 { background: var(--danger); color: #fff; font-weight: 700; }
+
+.label-pill {
+    font-size: 11px;
+    border-radius: 999px;
+    padding: 1px 8px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.card .avatars { display: inline-flex; margin-left: auto; }
+.card .avatars .avatar { width: 20px; height: 20px; font-size: 10px; margin-left: -4px; border: 1px solid var(--surface); }
+
+/* ------------------------------------------------------------ Dialoge */
+
+dialog {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, .35);
+    padding: 18px;
+    /* auf großen Bildschirmen 60vw, aber nie zu schmal/überbreit */
+    width: min(calc(100vw - 32px), max(600px, 60vw));
+    max-height: calc(100vh - 48px);
+}
+
+dialog::backdrop { background: rgba(0, 0, 0, .45); }
+
+dialog h3 { margin: 0 0 12px; }
+
+dialog form { display: flex; flex-direction: column; gap: 10px; }
+
+dialog label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); flex: 1; }
+/* [hidden] muss das display:flex der Labels schlagen, sonst bleiben nicht
+   relevante Wiederholungs-Felder sichtbar */
+dialog [hidden] { display: none !important; }
+/* Inline-Label (z.B. Checkbox + Text nebeneinander statt gestapelt) */
+dialog label.inline { flex-direction: row; align-items: center; gap: 6px; flex: 0 0 auto; white-space: nowrap; }
+
+/* Ansicht-teilen: URL-Feld + Kopieren nebeneinander */
+.share-url { display: flex; gap: 8px; align-items: stretch; }
+.share-url-input { flex: 1; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+.share-url button { flex: 0 0 auto; }
+.share-cols { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.share-cols label.inline { font-size: 13px; }
+
+dialog input, dialog textarea, dialog select {
+    font: inherit;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 9px;
+}
+
+dialog input:focus, dialog textarea:focus, dialog select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+dialog .row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+dialog footer { display: flex; gap: 8px; margin-top: 8px; }
+
+.hint { font-weight: 400; color: var(--muted); }
+
+.chip-pick { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.pick-chip {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    user-select: none;
+    background: var(--bg);
+}
+
+.pick-chip.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+
+.color-pick { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+.color-swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.color-swatch.selected { border-color: var(--text); }
+.color-swatch.none { background: var(--surface2); position: relative; }
+.color-swatch.none::after { content: "×"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+
+/* Freie Farbwahl: Swatch mit Regenbogen (öffnet den eigenen Colorpicker) */
+.color-swatch.custom {
+    background: conic-gradient(red, #ff0, lime, cyan, blue, magenta, red);
+    cursor: pointer;
+}
+
+/* Klickbarer Farb-Swatch (Labels) – öffnet den Colorpicker */
+.cp-trigger {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+}
+.cp-trigger.empty { background: conic-gradient(red, #ff0, lime, cyan, blue, magenta, red); }
+
+/* ---- Eingebetteter Colorpicker (colorpicker.js) ---- */
+.cp-pop {
+    position: fixed;
+    z-index: 1000;
+    width: 220px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    touch-action: none;
+}
+.cp-sv {
+    position: relative;
+    width: 100%;
+    height: 130px;
+    border-radius: 6px;
+    cursor: crosshair;
+    touch-action: none;
+}
+.cp-hue {
+    position: relative;
+    width: 100%;
+    height: 14px;
+    border-radius: 7px;
+    background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+    cursor: pointer;
+    touch-action: none;
+}
+.cp-cursor {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .5);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+.cp-hue-cursor {
+    position: absolute;
+    top: 50%;
+    width: 6px;
+    height: 20px;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .5);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+.cp-row { display: flex; align-items: center; gap: 8px; }
+.cp-preview { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); flex: none; }
+.cp-hex { flex: 1; text-transform: uppercase; }
+.cp-presets { display: flex; flex-wrap: wrap; gap: 5px; }
+.cp-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid var(--border);
+}
+.cp-swatch.none { position: relative; background: var(--surface2); }
+.cp-swatch.none::after { content: "×"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; }
+
+#checklistEdit { display: flex; flex-direction: column; gap: 4px; }
+
+.check-item { display: flex; gap: 6px; align-items: center; }
+.check-item input[type="text"] { flex: 1; }
+.check-item .rm { border: none; background: none; color: var(--muted); font-size: 16px; padding: 2px 6px; }
+
+.md-preview {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.md-preview p { margin: 4px 0; }
+
+/* Board-Verwaltung */
+
+#boardDialogBody { display: flex; flex-direction: column; gap: 10px; max-height: calc(100vh - 84px); }
+
+/* Tab-Layout im Einstellungen-Dialog: Kopf + Tabs fest, Inhalt scrollt, Footer fest */
+.tabbar { display: flex; gap: 2px; border-bottom: 1px solid var(--border); flex: none; }
+.tab-btn {
+    background: none;
+    border: none;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    padding: 8px 14px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+}
+.tab-btn:hover { background: none; color: var(--text); }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+.tab-panels { height: 380px; max-height: calc(100vh - 210px); overflow-y: auto; padding-right: 4px; }
+.tab-panel { display: flex; flex-direction: column; gap: 10px; }
+#boardDialogBody > footer { flex: none; border-top: 1px solid var(--border); padding-top: 10px; }
+
+.col-edit {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px;
+}
+
+.col-edit .drag { cursor: grab; color: var(--muted); padding: 0 4px; }
+.col-edit input[type="text"] { flex: 1; min-width: 80px; }
+.col-edit input[type="number"] { width: 60px; }
+.col-edit label.inline { flex-direction: row; align-items: center; gap: 4px; white-space: nowrap; }
+
+/* Label-Verwaltung (Board-Einstellungen) */
+.label-edit {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px;
+}
+.label-edit input[type="text"] { flex: 1; min-width: 80px; }
+
+/* nativer Colorpicker – kompakt und konsistent */
+input[type="color"] {
+    width: 34px;
+    min-width: 34px;
+    height: 30px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    cursor: pointer;
+}
+
+/* Inline-Label-Anlegen im Karten-Dialog */
+.label-new {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 4px;
+}
+.label-new input[type="text"] { width: 120px; padding: 2px 6px; font-size: 13px; }
+.label-new input[type="color"] { width: 28px; min-width: 28px; height: 24px; }
+button.mini {
+    padding: 2px 8px;
+    font-size: 14px;
+    line-height: 1;
+    border-radius: 6px;
+}
+
+/* ------------------------------------------------------------ Mobil */
+
+@media (max-width: 600px) {
+    .column { min-width: 84vw; width: 84vw; }
+    #boardSelect { max-width: 34vw; }
+}
+
+.col-toggle {
+    margin-left: auto;
+    background: none;
+    border: none;
+    padding: 0 2px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.85;
+}
+.col-toggle:hover { background: none; opacity: 1; }
+.col-toggle.off { opacity: 0.3; filter: grayscale(1); }
+
+/* Schnellablage-Ziele beim Ziehen einer Karte (unter der aufgenommenen Karte) */
+.quick-move {
+    position: fixed;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none;   /* die Leiste selbst fängt keine Klicks, nur die Zonen */
+}
+.quick-target {
+    pointer-events: auto;
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border: 2px dashed var(--accent);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 13px;
+    box-shadow: var(--shadow);
+    opacity: 0.96;
+}
+.quick-target.sortable-over,
+.quick-target:hover {
+    background: var(--accent);
+    color: #fff;
+    border-style: solid;
+}

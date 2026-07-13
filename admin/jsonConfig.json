@@ -1,0 +1,198 @@
+{
+    "type": "tabs",
+    "items": {
+        "generalTab": {
+            "type": "panel",
+            "label": { "en": "General", "de": "Allgemein" },
+            "items": {
+                "port": {
+                    "type": "number",
+                    "min": 1,
+                    "max": 65535,
+                    "label": { "en": "Port", "de": "Port" },
+                    "sm": 6, "md": 3
+                },
+                "bind": {
+                    "type": "ip",
+                    "listenOnAllPorts": true,
+                    "label": { "en": "Listen address", "de": "IP-Adresse" },
+                    "sm": 6, "md": 4
+                },
+                "publicUrl": {
+                    "type": "text",
+                    "label": { "en": "Public base URL (for email links)", "de": "Basis-URL (für Links in E-Mails)" },
+                    "help": { "en": "e.g. http://192.168.1.10:8095 — empty = auto-detect", "de": "z.B. http://192.168.1.10:8095 — leer = automatisch" },
+                    "sm": 12, "md": 5
+                },
+                "language": {
+                    "type": "select",
+                    "label": { "en": "Language", "de": "Sprache" },
+                    "help": { "en": "Empty/Auto = ioBroker system language", "de": "Leer/Automatisch = ioBroker-Systemsprache" },
+                    "options": [
+                        { "label": { "en": "Auto (system)", "de": "Automatisch (System)" }, "value": "" },
+                        { "label": { "en": "Deutsch", "de": "Deutsch" }, "value": "de" },
+                        { "label": { "en": "English", "de": "English" }, "value": "en" },
+                        { "label": { "en": "Français", "de": "Französisch" }, "value": "fr" },
+                        { "label": { "en": "Nederlands", "de": "Niederländisch" }, "value": "nl" },
+                        { "label": { "en": "Italiano", "de": "Italienisch" }, "value": "it" }
+                    ],
+                    "sm": 6, "md": 3
+                },
+                "themeDefault": {
+                    "type": "select",
+                    "label": { "en": "Default theme", "de": "Standard-Theme" },
+                    "options": [
+                        { "label": { "en": "Auto (system)", "de": "Automatisch (System)" }, "value": "auto" },
+                        { "label": { "en": "Light", "de": "Hell" }, "value": "light" },
+                        { "label": { "en": "Dark", "de": "Dunkel" }, "value": "dark" }
+                    ],
+                    "sm": 6, "md": 3
+                },
+                "accentColor": {
+                    "type": "color",
+                    "label": { "en": "Accent color", "de": "Akzentfarbe" },
+                    "sm": 6, "md": 3
+                },
+                "customCss": {
+                    "type": "text",
+                    "multiline": true,
+                    "minRows": 4,
+                    "label": { "en": "Custom CSS", "de": "Eigenes CSS" },
+                    "help": { "en": "Loaded as last stylesheet in the board UI", "de": "Wird als letztes Stylesheet in der Board-Oberfläche geladen" },
+                    "sm": 12
+                }
+            }
+        },
+        "usersTab": {
+            "type": "panel",
+            "label": { "en": "Users", "de": "Benutzer" },
+            "items": {
+                "_info": {
+                    "type": "staticText",
+                    "text": { "en": "Users can be assigned to cards. No login — selection happens in the board UI.", "de": "Benutzer können Karten zugewiesen werden. Kein Login — die Auswahl erfolgt in der Board-Oberfläche." },
+                    "sm": 12
+                },
+                "users": {
+                    "type": "table",
+                    "label": { "en": "Users", "de": "Benutzer" },
+                    "sm": 12,
+                    "items": [
+                        { "type": "text", "attr": "name", "width": "10%", "title": { "en": "ID (lowercase)", "de": "ID (klein, ohne Umlaute)" }, "filter": false, "sort": false },
+                        { "type": "text", "attr": "displayName", "width": "15%", "title": { "en": "Display name", "de": "Anzeigename" }, "filter": false, "sort": false },
+                        { "type": "text", "attr": "email", "width": "26%", "title": { "en": "Email", "de": "E-Mail" }, "filter": false, "sort": false },
+                        { "type": "color", "attr": "color", "width": "7%", "title": { "en": "Color", "de": "Farbe" } },
+                        { "type": "checkbox", "attr": "notifyAssigned", "width": "7%", "title": { "en": "→ assigned", "de": "→ Zugew." }, "tooltip": { "en": "E-mail when a card is assigned to this user", "de": "E-Mail, wenn diesem Benutzer eine Karte zugewiesen wird" }, "filter": false, "sort": false },
+                        { "type": "checkbox", "attr": "notifyDue", "width": "7%", "title": { "en": "→ due", "de": "→ Fällig" }, "tooltip": { "en": "E-mail when a card of this user is due/overdue", "de": "E-Mail, wenn eine Karte dieses Benutzers fällig/überfällig ist" }, "filter": false, "sort": false },
+                        { "type": "checkbox", "attr": "notifyUpdated", "width": "7%", "title": { "en": "→ changed", "de": "→ Geänd." }, "tooltip": { "en": "E-mail when a card of this user is edited", "de": "E-Mail, wenn eine Karte dieses Benutzers bearbeitet wird" }, "filter": false, "sort": false },
+                        { "type": "checkbox", "attr": "notifyMoved", "width": "7%", "title": { "en": "→ moved", "de": "→ Versch." }, "tooltip": { "en": "E-mail when a card is moved to another column", "de": "E-Mail, wenn eine Karte in eine andere Spalte verschoben wird" }, "filter": false, "sort": false },
+                        { "type": "checkbox", "attr": "notifyDone", "width": "7%", "title": { "en": "→ done", "de": "→ Erled." }, "tooltip": { "en": "E-mail when a card is marked done", "de": "E-Mail, wenn eine Karte als erledigt markiert wird" }, "filter": false, "sort": false },
+                        { "type": "checkbox", "attr": "notifyCreated", "width": "7%", "title": { "en": "→ created", "de": "→ Neu" }, "tooltip": { "en": "E-mail when a new card is created", "de": "E-Mail, wenn eine neue Karte erstellt wird" }, "filter": false, "sort": false }
+                    ]
+                },
+                "_notifyInfo": {
+                    "type": "staticText",
+                    "text": {
+                        "en": "The six \"→\" columns control per user which card events trigger an e-mail to their address: assigned to them, due/overdue, changed, moved, done, newly created. Leave a box unchecked to use the global default (Email tab). An e-mail is only sent if the user has an address and the Email tab is configured.",
+                        "de": "Die sechs \"→\"-Spalten legen je Benutzer fest, bei welchen Karten-Ereignissen eine E-Mail an seine Adresse geht: ihm zugewiesen, fällig/überfällig, geändert, verschoben, erledigt, neu erstellt. Nicht angehakt = globale Vorgabe (Tab „E-Mail\"). Eine E-Mail wird nur gesendet, wenn beim Benutzer eine Adresse hinterlegt und der E-Mail-Tab konfiguriert ist."
+                    },
+                    "sm": 12
+                }
+            }
+        },
+        "emailTab": {
+            "type": "panel",
+            "label": { "en": "Email", "de": "E-Mail" },
+            "items": {
+                "emailInstance": {
+                    "type": "instance",
+                    "adapter": "email",
+                    "label": { "en": "Email adapter instance", "de": "email-Adapter-Instanz" },
+                    "sm": 6, "md": 4
+                },
+                "emailFrom": {
+                    "type": "text",
+                    "label": { "en": "Sender address (empty = adapter default)", "de": "Absender (leer = Standard des email-Adapters)" },
+                    "sm": 6, "md": 4
+                },
+                "reminderTime": {
+                    "type": "text",
+                    "label": { "en": "Reminder time (HH:MM)", "de": "Erinnerungs-Uhrzeit (HH:MM)" },
+                    "validator": "!data.reminderTime || /^([01]?\\d|2[0-3]):[0-5]\\d$/.test(data.reminderTime)",
+                    "validatorErrorText": { "en": "Format HH:MM", "de": "Format HH:MM" },
+                    "sm": 6, "md": 2
+                },
+                "reminderDaysBefore": {
+                    "type": "number",
+                    "min": 0,
+                    "max": 30,
+                    "label": { "en": "Remind X days before due", "de": "Erinnern X Tage vor Fälligkeit" },
+                    "sm": 6, "md": 2
+                },
+                "_hdr": {
+                    "type": "header",
+                    "size": 5,
+                    "text": { "en": "Default (used when a user has no own setting)", "de": "Standard-Vorgabe (greift, wenn beim Benutzer nichts gesetzt ist)" },
+                    "sm": 12
+                },
+                "notifyAssigned": { "type": "checkbox", "label": { "en": "Card assigned", "de": "Karte zugewiesen" }, "sm": 6, "md": 2 },
+                "notifyDue": { "type": "checkbox", "label": { "en": "Card due/overdue", "de": "Karte fällig/überfällig" }, "sm": 6, "md": 2 },
+                "notifyUpdated": { "type": "checkbox", "label": { "en": "Card changed", "de": "Karte geändert" }, "sm": 6, "md": 2 },
+                "notifyCreated": { "type": "checkbox", "label": { "en": "Card created", "de": "Karte erstellt" }, "sm": 6, "md": 2 },
+                "notifyMoved": { "type": "checkbox", "label": { "en": "Card moved", "de": "Karte verschoben" }, "sm": 6, "md": 2 },
+                "notifyDone": { "type": "checkbox", "label": { "en": "Card done", "de": "Karte erledigt" }, "sm": 6, "md": 2 }
+            }
+        },
+        "webhookInTab": {
+            "type": "panel",
+            "label": { "en": "Webhooks (in)", "de": "Webhooks (eingehend)" },
+            "items": {
+                "_info": {
+                    "type": "staticText",
+                    "text": { "en": "External systems (scripts, AI agents, …) read and write cards via POST /webhook/<token>/action — see README for the command vocabulary. Each integration should get its own token.", "de": "Externe Systeme (Skripte, KI-Agenten, …) lesen und schreiben Karten via POST /webhook/<token>/action — Kommandos siehe README. Jede Integration sollte einen eigenen Token bekommen." },
+                    "sm": 12
+                },
+                "generateToken": {
+                    "type": "sendTo",
+                    "command": "generateToken",
+                    "useNative": true,
+                    "variant": "contained",
+                    "label": { "en": "Generate new token", "de": "Neuen Token generieren" },
+                    "sm": 12, "md": 4
+                },
+                "inboundTokens": {
+                    "type": "table",
+                    "label": { "en": "Tokens", "de": "Tokens" },
+                    "sm": 12,
+                    "items": [
+                        { "type": "text", "attr": "name", "width": "20%", "title": { "en": "Name", "de": "Name" }, "filter": false, "sort": false },
+                        { "type": "text", "attr": "token", "width": "40%", "title": { "en": "Token", "de": "Token" }, "filter": false, "sort": false },
+                        { "type": "text", "attr": "allowedBoards", "width": "25%", "title": { "en": "Allowed boards (comma or *)", "de": "Erlaubte Boards (Komma oder *)" }, "default": "*", "filter": false, "sort": false },
+                        { "type": "checkbox", "attr": "enabled", "width": "15%", "title": { "en": "Enabled", "de": "Aktiv" }, "default": true }
+                    ]
+                }
+            }
+        },
+        "webhookOutTab": {
+            "type": "panel",
+            "label": { "en": "Webhooks (out)", "de": "Webhooks (ausgehend)" },
+            "items": {
+                "_info": {
+                    "type": "staticText",
+                    "text": { "en": "On events the adapter POSTs a JSON payload to these URLs. Events: cardCreated, cardUpdated, cardMoved, cardAssigned, cardDone, cardDeleted, cardDue — or * for all.", "de": "Bei Ereignissen sendet der Adapter einen JSON-POST an diese URLs. Ereignisse: cardCreated, cardUpdated, cardMoved, cardAssigned, cardDone, cardDeleted, cardDue — oder * für alle." },
+                    "sm": 12
+                },
+                "outboundWebhooks": {
+                    "type": "table",
+                    "label": { "en": "Webhooks", "de": "Webhooks" },
+                    "sm": 12,
+                    "items": [
+                        { "type": "text", "attr": "name", "width": "20%", "title": { "en": "Name", "de": "Name" }, "filter": false, "sort": false },
+                        { "type": "text", "attr": "url", "width": "40%", "title": { "en": "URL", "de": "URL" }, "filter": false, "sort": false },
+                        { "type": "text", "attr": "events", "width": "25%", "title": { "en": "Events (comma or *)", "de": "Ereignisse (Komma oder *)" }, "default": "*", "filter": false, "sort": false },
+                        { "type": "checkbox", "attr": "enabled", "width": "15%", "title": { "en": "Enabled", "de": "Aktiv" }, "default": true }
+                    ]
+                }
+            }
+        }
+    }
+}
