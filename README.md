@@ -1,4 +1,4 @@
-# ioBroker.kanban
+# iobroker.kanban
 
 Kanban board adapter for ioBroker with its **own web server**, live sync, webhooks, multi-user support and e-mail notifications (including calendar invites) via the `email` adapter.
 
