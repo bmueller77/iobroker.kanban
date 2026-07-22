@@ -7,6 +7,20 @@
       "en": "Kanban Board",
       "de": "Kanban Board"
     },
+    "keywords": [
+      "kanban",
+      "board",
+      "tasks",
+      "todo",
+      "checklist",
+      "project",
+      "family",
+      "organizer"
+    ],
+    "type": "misc-data",
+    "connectionType": "local",
+    "dataSource": "push",
+    "tier": 3,
     "desc": {
       "en": "Kanban board with own web server, webhooks, multi-user support and email notifications",
       "de": "Kanban-Board mit eigenem Webserver, Webhooks, Multiuser-Support und E-Mail-Benachrichtigungen"
