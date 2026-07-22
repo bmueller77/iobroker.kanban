@@ -3,6 +3,7 @@
 import { openColorPicker } from './colorpicker.js';
 import { api } from './api.js';
 import { t } from './i18n.js';
+import { boardUsers, contrastText } from './board.js';
 
 const CARD_COLORS = ['', '#e57373', '#ffb74d', '#fff176', '#aed581', '#4fc3f7', '#9575cd', '#f06292', '#a1887f'];
 const WEEKDAYS = [['Mo', 1], ['Di', 2], ['Mi', 3], ['Do', 4], ['Fr', 5], ['Sa', 6], ['So', 7]];
@@ -77,7 +78,9 @@ export function initDialogs(state, actions) {
     function renderAssigneePick() {
         const box = document.getElementById('assigneePick');
         box.textContent = '';
-        for (const u of state.users) {
+        const list = boardUsers(state).slice();
+        for (const u of (state.users || [])) if (selAssignees.has(u.name) && !list.some(x => x.name === u.name)) list.push(u);
+        for (const u of list) {
             const chip = el('span', 'pick-chip', u.displayName);
             chip.style.borderColor = selAssignees.has(u.name) ? (u.color || '') : '';
             if (selAssignees.has(u.name)) chip.classList.add('selected');
@@ -87,6 +90,14 @@ export function initDialogs(state, actions) {
             });
             box.appendChild(chip);
         }
+        updateAssigneeValidity();
+    }
+
+    // Pflicht: mindestens ein Zustaendiger. Proxy-Input traegt die (lokalisierte)
+    // Fehlermeldung, damit die native Browser-Blase erscheint - wie beim Titel.
+    function updateAssigneeValidity() {
+        const p = document.getElementById('assigneeValidity');
+        if (p) p.setCustomValidity(selAssignees.size ? '' : t('card.assigneeRequired'));
     }
 
     function renderLabelPick() {
@@ -97,7 +108,7 @@ export function initDialogs(state, actions) {
             if (selLabels.has(l.id)) {
                 chip.classList.add('selected');
                 chip.style.background = l.color || '';
-                chip.style.color = '#fff';
+                chip.style.color = contrastText(l.color || '#888');
             }
             chip.addEventListener('click', () => {
                 selLabels.has(l.id) ? selLabels.delete(l.id) : selLabels.add(l.id);
@@ -227,7 +238,7 @@ export function initDialogs(state, actions) {
         form.elements.location.value = (card && card.location) || '';
         form.elements.calendarInvite.checked = !!(card && card.calendarInvite);
         fillColumnSelect(card ? card.columnId : defaultColumnId);
-        selAssignees = new Set(card ? card.assignees : (state.user ? [state.user] : []));
+        selAssignees = new Set(card ? card.assignees : []);
         selLabels = new Set(card ? card.labels : []);
         selColor = (card && card.color) || '';
         renderAssigneePick();
@@ -357,6 +368,10 @@ export function initDialogs(state, actions) {
         dlg.close();
     });
 
+    // Titel-Pflichtmeldung in Board-Sprache statt Browser-Standardtext.
+    form.elements.title.addEventListener('invalid', () => form.elements.title.setCustomValidity(t('card.titleRequired')));
+    form.elements.title.addEventListener('input', () => form.elements.title.setCustomValidity(''));
+
     form.addEventListener('submit', async ev => {
         ev.preventDefault();
         const data = {
@@ -377,6 +392,7 @@ export function initDialogs(state, actions) {
             columnId: form.elements.columnId.value,
         };
         if (!data.title) return;
+        if (!data.assignees.length) { updateAssigneeValidity(); const p = document.getElementById('assigneeValidity'); if (p) p.reportValidity(); return; }
         try {
             if (editingCardId) {
                 await actions.updateCard(editingCardId, data);
@@ -418,7 +434,15 @@ export function initDialogs(state, actions) {
             tabs.push({ id, btn, panel });
         };
 
-        let titleInput = null, colBox = null, labelBox = null;
+        let titleInput = null, colBox = null, labelBox = null, linkTargetSel = null, linkUrlInput = null;
+        const memberBoxes = {};
+        let saveBtn = null;
+        const validateMembers = () => {
+            if (!saveBtn) return;
+            const bad = state.boards.some(b => memberBoxes[b.id] && memberBoxes[b.id].querySelectorAll('input:checked').length === 0);
+            saveBtn.disabled = bad;
+            saveBtn.title = bad ? t('boards.membersRequiredShort') : '';
+        };
 
         // ---- Tab: aktuelles Board (Titel, Spalten, Labels) ----
         if (state.board) {
@@ -431,9 +455,21 @@ export function initDialogs(state, actions) {
                 panel.appendChild(titleLabel);
 
                 panel.appendChild(el('label', null, t('boards.columns')));
+                const chead = el('div', 'col-head');
+                const hcell = (cls, label, tip) => { const s = el('span', cls, label); s.title = tip; return s; };
+                chead.append(
+                    el('span', 'h-drag'),
+                    hcell('h-name', t('boards.colTitle'), t('boards.legendTitle')),
+                    hcell('h-num', t('boards.colMax'), t('boards.legendMax')),
+                    hcell('h-num', t('boards.colWip'), t('boards.legendWip')),
+                    hcell('h-new', t('boards.allowAdd'), t('boards.legendAdd')),
+                    hcell('h-done', t('boards.done'), t('boards.legendDone')),
+                    el('span', 'h-rm'),
+                );
+                panel.appendChild(chead);
                 colBox = el('div');
                 colBox.style.cssText = 'display:flex;flex-direction:column;gap:6px';
-                const mkColRow = col => {
+                const mkColRow = (col, i) => {
                     const row = el('div', 'col-edit');
                     row.dataset.colId = col.id || '';
                     const drag = el('span', 'drag', '\u2833');
@@ -441,29 +477,45 @@ export function initDialogs(state, actions) {
                     name.type = 'text';
                     name.value = col.title;
                     name.placeholder = t('boards.columnName');
+                    name.title = t('boards.legendTitle');
+                    const max = document.createElement('input');
+                    max.type = 'number';
+                    max.min = '0';
+                    max.value = String(col.maxVisible || 0);
+                    max.title = t('boards.maxTitle');
+                    max.className = 'col-max';
                     const wip = document.createElement('input');
                     wip.type = 'number';
                     wip.min = '0';
                     wip.value = String(col.wipLimit || 0);
                     wip.title = t('boards.wipTitle');
-                    const doneLbl = el('label', 'inline');
+                    wip.className = 'col-wip';
+                    const doneLbl = el('label', 'col-chk c-done');
                     const done = document.createElement('input');
-                    done.type = 'checkbox';
+                    done.type = 'checkbox'; done.className = 'col-done';
                     done.checked = !!col.isDone;
-                    doneLbl.append(done, document.createTextNode(t('boards.done')));
+                    done.title = t('boards.legendDone'); done.setAttribute('aria-label', t('boards.done'));
+                    doneLbl.appendChild(done);
+                    const addLbl = el('label', 'col-chk c-new');
+                    const addChk = document.createElement('input');
+                    addChk.type = 'checkbox'; addChk.className = 'col-add';
+                    addChk.checked = (typeof col.allowAdd === 'boolean') ? col.allowAdd : (i === 0);
+                    addChk.title = t('boards.legendAdd'); addChk.setAttribute('aria-label', t('boards.allowAdd'));
+                    addLbl.appendChild(addChk);
                     const rm = el('button', 'rm', '\u00d7');
                     rm.type = 'button';
                     rm.title = t('boards.deleteColumnTitle');
                     rm.addEventListener('click', () => row.remove());
-                    row.append(drag, name, wip, doneLbl, rm);
+                    drag.title = t('boards.dragTitle');
+                    row.append(drag, name, max, wip, addLbl, doneLbl, rm);
                     return row;
                 };
-                for (const col of state.board.columns) colBox.appendChild(mkColRow(col));
+                state.board.columns.forEach((col, i) => colBox.appendChild(mkColRow(col, i)));
                 panel.appendChild(colBox);
                 // eslint-disable-next-line no-undef
                 Sortable.create(colBox, { handle: '.drag', animation: 150 });
                 const addCol = el('button', 'linkbtn', t('boards.addColumn'));
-                addCol.addEventListener('click', () => colBox.appendChild(mkColRow({ title: '', wipLimit: 0, isDone: false })));
+                addCol.addEventListener('click', () => colBox.appendChild(mkColRow({ title: '', maxVisible: 0, wipLimit: 0, isDone: false, allowAdd: false })));
                 panel.appendChild(addCol);
 
                 panel.appendChild(el('label', null, t('boards.labels')));
@@ -489,6 +541,26 @@ export function initDialogs(state, actions) {
                 const addLabel = el('button', 'linkbtn', t('boards.addLabel'));
                 addLabel.addEventListener('click', () => labelBox.appendChild(mkLabelRow({ color: '#4CAF50' })));
                 panel.appendChild(addLabel);
+
+                // Link-Ziel für Benachrichtigungen (je Board)
+                panel.appendChild(el('label', null, t('boards.linkTarget')));
+                linkTargetSel = document.createElement('select');
+                for (const [val, key] of [['board', 'boards.linkBoard'], ['edit', 'boards.linkEdit'], ['url', 'boards.linkUrl']]) {
+                    const o = document.createElement('option');
+                    o.value = val; o.textContent = t(key);
+                    linkTargetSel.appendChild(o);
+                }
+                linkTargetSel.value = state.board.linkTarget || 'board';
+                panel.appendChild(linkTargetSel);
+                const linkUrlWrap = el('label', null, t('boards.linkUrlField'));
+                linkUrlInput = document.createElement('input');
+                linkUrlInput.type = 'url';
+                linkUrlInput.placeholder = 'https://\u2026';
+                linkUrlInput.value = state.board.linkUrl || '';
+                linkUrlWrap.appendChild(linkUrlInput);
+                linkUrlWrap.hidden = linkTargetSel.value !== 'url';
+                panel.appendChild(linkUrlWrap);
+                linkTargetSel.addEventListener('change', () => { linkUrlWrap.hidden = linkTargetSel.value !== 'url'; });
             });
         }
 
@@ -531,7 +603,19 @@ export function initDialogs(state, actions) {
                         await api(`api/users/${encodeURIComponent(u.name)}/avatar`, { method: 'DELETE' });
                         u.avatar = false; await actions.avatarsChanged(); paint(); rm.hidden = true;
                     });
-                    row.append(prev, nm, pick, file, rm);
+                    let colorTimer = null;
+                    const colorTrig = makeColorTrigger(u.color || '#7E57C2', (col) => {
+                        u.color = col;
+                        clearTimeout(colorTimer);
+                        colorTimer = setTimeout(async () => {
+                            try {
+                                await api(`api/users/${encodeURIComponent(u.name)}`, { method: 'PATCH', body: { color: col } });
+                                await actions.avatarsChanged();
+                            } catch (e) { alert(t('avatar.failed', { msg: e.message })); }
+                        }, 500);
+                    });
+                    colorTrig.title = t('user.color');
+                    row.append(prev, nm, colorTrig, pick, file, rm);
                     panel.appendChild(row);
                 }
             });
@@ -553,6 +637,30 @@ export function initDialogs(state, actions) {
             });
             newRow.append(newInput, newBtn);
             panel.appendChild(newRow);
+
+            // Mitglieder je Board (wer ist zuweisbar) - zentral fuer alle Boards
+            if ((state.users || []).length && state.boards.length) {
+                panel.appendChild(el('label', null, t('boards.members')));
+                const mHint = el('div', 'hint'); mHint.textContent = t('boards.membersHint'); panel.appendChild(mHint);
+                for (const b of state.boards) {
+                    const grp = el('div', 'board-members');
+                    grp.appendChild(el('div', 'board-members-title', b.title));
+                    const wrap = el('div', 'share-cols');
+                    const cur = Array.isArray(b.members) ? b.members : [];
+                    for (const u of state.users) {
+                        const lab = el('label', 'inline');
+                        const inp = document.createElement('input');
+                        inp.type = 'checkbox'; inp.dataset.val = u.name; inp.checked = cur.includes(u.name);
+                        inp.addEventListener('change', validateMembers);
+                        lab.append(inp, document.createTextNode(' ' + (u.displayName || u.name)));
+                        wrap.appendChild(lab);
+                    }
+                    grp.appendChild(wrap);
+                    memberBoxes[b.id] = wrap;
+                    panel.appendChild(grp);
+                }
+            }
+
             if (state.board) {
                 const delBoard = el('button', 'danger', t('boards.deleteBoard'));
                 delBoard.type = 'button';
@@ -574,14 +682,23 @@ export function initDialogs(state, actions) {
         closeBtn.addEventListener('click', () => bdlg.close());
         foot.appendChild(closeBtn);
         if (state.board) {
-            const save = el('button', 'primary', t('boards.save'));
-            save.type = 'button';
-            save.addEventListener('click', async () => {
+            saveBtn = el('button', 'primary', t('boards.save'));
+            saveBtn.type = 'button';
+            saveBtn.addEventListener('click', async () => {
+                // Mitglieder je Board einsammeln + validieren (jedes Board mind. 1)
+                const memberSel = {};
+                for (const b of state.boards) {
+                    if (memberBoxes[b.id]) memberSel[b.id] = [...memberBoxes[b.id].querySelectorAll('input:checked')].map(i => i.dataset.val);
+                }
+                const emptyB = state.boards.filter(b => memberBoxes[b.id] && memberSel[b.id].length === 0);
+                if (emptyB.length) { alert(t('boards.membersRequired', { boards: emptyB.map(b => b.title).join(', ') })); activate('boards'); return; }
                 const columns = [...colBox.children].map(row => ({
                     id: row.dataset.colId || undefined,
                     title: row.querySelector('input[type=text]').value.trim() || '?',
-                    wipLimit: Number(row.querySelector('input[type=number]').value) || 0,
-                    isDone: row.querySelector('input[type=checkbox]').checked,
+                    maxVisible: Number(row.querySelector('.col-max').value) || 0,
+                    wipLimit: Number(row.querySelector('.col-wip').value) || 0,
+                    isDone: row.querySelector('.col-done').checked,
+                    allowAdd: row.querySelector('.col-add').checked,
                 }));
                 const labels = [...labelBox.children].map(row => {
                     const title = row.querySelector('input[type=text]').value.trim();
@@ -592,10 +709,21 @@ export function initDialogs(state, actions) {
                         color: row.querySelector('.cp-trigger').dataset.color || '#4CAF50',
                     };
                 }).filter(Boolean);
-                await actions.patchBoard({ title: titleInput.value.trim() || state.board.title, columns, labels });
+                await actions.patchBoard({ title: titleInput.value.trim() || state.board.title, columns, labels,
+                    linkTarget: linkTargetSel ? linkTargetSel.value : undefined,
+                    linkUrl: linkUrlInput ? linkUrlInput.value.trim() : undefined,
+                    members: memberSel[state.board.id] });
+                // andere Boards: nur Mitglieder patchen, falls geaendert
+                for (const b of state.boards) {
+                    if (b.id === state.board.id || !memberBoxes[b.id]) continue;
+                    const before = (Array.isArray(b.members) ? b.members : []).slice().sort().join(',');
+                    const after = (memberSel[b.id] || []).slice().sort().join(',');
+                    if (before !== after) await actions.patchBoardById(b.id, { members: memberSel[b.id] });
+                }
                 bdlg.close();
             });
-            foot.appendChild(save);
+            foot.appendChild(saveBtn);
+            validateMembers();
         }
         body.appendChild(foot);
 
@@ -614,7 +742,7 @@ export function initDialogs(state, actions) {
         const opt = {
             board: (state.board && state.board.id) || (state.boards[0] && state.boards[0].id) || '',
             users: [], labels: [], columns: null, doneLimit: null,
-            hideSettings: false, hideFilter: false, embed: false,
+            hideSettings: false, embed: false,
         };
 
         const mkCheck = (text) => {
@@ -637,7 +765,7 @@ export function initDialogs(state, actions) {
         const usersLabel = el('label', null, t('share.users'));
         const usersWrap = el('div', 'share-cols');
         const updateUsers = () => { opt.users = [...usersWrap.querySelectorAll('input:checked')].map(i => i.dataset.val); };
-        for (const u of state.users) {
+        for (const u of boardUsers(state)) {
             const chk = mkCheck(u.displayName);
             chk.inp.dataset.val = u.name;
             chk.inp.addEventListener('change', () => { updateUsers(); update(); });
@@ -663,7 +791,6 @@ export function initDialogs(state, actions) {
         }
 
         const cHideSettings = mkCheck(t('share.hideSettings'));
-        const cHideFilter = mkCheck(t('share.hideFilter'));
         const cEmbed = mkCheck(t('share.embed'));
 
         // Sichtbare Spalten (des gewählten Boards) – alle an = kein Filter
@@ -709,7 +836,6 @@ export function initDialogs(state, actions) {
             if (opt.columns && opt.columns.length) p.set('columns', opt.columns.join(','));
             if (opt.doneLimit != null) p.set('doneLimit', String(opt.doneLimit));
             if (opt.hideSettings) p.set('hideSettings', '1');
-            if (opt.hideFilter) p.set('hideFilter', '1');
             if (opt.embed) p.set('embed', '1');
             const q = p.toString();
             return location.origin + location.pathname + (q ? '?' + q : '');
@@ -719,7 +845,6 @@ export function initDialogs(state, actions) {
         board.sel.addEventListener('change', async () => { opt.board = board.sel.value; await Promise.all([fillLabels(opt.board), fillColumns(opt.board)]); update(); });
         doneLimitInp.addEventListener('input', () => { opt.doneLimit = doneLimitInp.value === '' ? null : Math.max(0, parseInt(doneLimitInp.value, 10) || 0); update(); });
         cHideSettings.inp.addEventListener('change', () => { opt.hideSettings = cHideSettings.inp.checked; update(); });
-        cHideFilter.inp.addEventListener('change', () => { opt.hideFilter = cHideFilter.inp.checked; update(); });
         cEmbed.inp.addEventListener('change', () => { opt.embed = cEmbed.inp.checked; update(); });
         copyBtn.addEventListener('click', async () => {
             const done = () => { copyBtn.textContent = t('share.copied'); setTimeout(() => { copyBtn.textContent = t('share.copy'); }, 1500); };
@@ -728,7 +853,7 @@ export function initDialogs(state, actions) {
         });
 
         body.append(board.lab, usersLabel, usersWrap, labelsLabel, labelsWrap, colsLabel, colsWrap, doneLimitLbl,
-            cHideSettings.lab, cHideFilter.lab, cEmbed.lab,
+            cHideSettings.lab, cEmbed.lab,
             el('label', null, t('share.generatedUrl')), urlWrap);
 
         const foot = el('footer');

@@ -26,6 +26,14 @@ html[data-theme="dark"] {
 
 * { box-sizing: border-box; }
 
+/* Schlanke, themenkonforme Scrollbalken */
+* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); border-radius: 6px; border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+
 html, body {
     margin: 0;
     height: 100%;
@@ -79,7 +87,7 @@ button:hover { background: var(--surface2); }
 button.primary {
     background: var(--accent);
     border-color: var(--accent);
-    color: #fff;
+    color: var(--accent-text, #fff);
     font-weight: 600;
 }
 
@@ -88,7 +96,8 @@ button.primary:hover { filter: brightness(1.1); background: var(--accent); }
 button.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
 
 button.iconbtn { padding: 6px 10px; font-size: 16px; line-height: 1; }
-button.iconbtn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.iconbtn svg { width: 18px; height: 18px; display: block; }
+button.iconbtn.active { background: var(--accent); color: var(--accent-text, #fff); border-color: var(--accent); }
 
 button.linkbtn {
     border: none;
@@ -106,7 +115,7 @@ button.linkbtn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     border-radius: 999px;
     padding: 3px 10px 3px 4px;
     cursor: pointer;
@@ -114,9 +123,9 @@ button.linkbtn {
     user-select: none;
 }
 
-.user-chip .avatar { width: 22px; height: 22px; font-size: 11px; }
+.user-chip .avatar { width: 33px; height: 33px; font-size: 16px; }
 
-.user-chip.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.user-chip.active { border-color: var(--uc, var(--accent)); }
 
 .avatar {
     display: inline-flex;
@@ -199,8 +208,18 @@ img.avatar, .avatar img { object-fit: cover; width: 100%; height: 100%; border-r
     box-shadow: var(--shadow);
     padding: 8px 10px;
     cursor: grab;
-    border-left: 4px solid transparent;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* Farbstreifen links - unabhaengig vom Kartenrahmen (nutzt --card-color) */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 4px;
+    background: var(--card-color, transparent);
+    border-radius: 8px 0 0 8px;
+    pointer-events: none;
 }
 
 /* Checklisten-Aufklappbutton (Chevron) oben rechts in der Karte */
@@ -256,6 +275,9 @@ img.avatar, .avatar img { object-fit: cover; width: 100%; height: 100%; border-r
     white-space: nowrap;
 }
 
+.badge svg { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; }
+.card-check-toggle svg { width: 14px; height: 14px; }
+.col-chevron svg { width: 13px; height: 13px; vertical-align: -2px; }
 .badge.date-badge { color: var(--text); font-weight: 500; }
 .badge.due-overdue { background: var(--danger); color: #fff; }
 a.link-badge {
@@ -293,7 +315,7 @@ html[data-theme="dark"] a.link-badge:hover {
 }
 
 .card .avatars { display: inline-flex; margin-left: auto; }
-.card .avatars .avatar { width: 20px; height: 20px; font-size: 10px; margin-left: -4px; border: 1px solid var(--surface); }
+.card .avatars .avatar { width: 30px; height: 30px; font-size: 15px; font-weight: 500; margin-left: -3px; box-shadow: 0 0 0 2px var(--uc, var(--surface)); }
 
 /* ------------------------------------------------------------ Dialoge */
 
@@ -315,18 +337,23 @@ dialog h3 { margin: 0 0 12px; }
 
 dialog form { display: flex; flex-direction: column; gap: 10px; }
 
-dialog label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); flex: 1; }
+dialog label { display: flex; flex-direction: column; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
 /* [hidden] muss das display:flex der Labels schlagen, sonst bleiben nicht
    relevante Wiederholungs-Felder sichtbar */
 dialog [hidden] { display: none !important; }
 /* Inline-Label (z.B. Checkbox + Text nebeneinander statt gestapelt) */
-dialog label.inline { flex-direction: row; align-items: center; gap: 6px; flex: 0 0 auto; white-space: nowrap; }
+dialog label.inline { flex-direction: row; align-items: center; gap: 6px; flex: 0 0 auto; white-space: nowrap; font-weight: 400; color: var(--muted); }
+dialog button { font-size: 13px; }
+#shareBody { display: flex; flex-direction: column; gap: 10px; }
+#checklistEdit:empty { display: none; }
 
 /* Ansicht-teilen: URL-Feld + Kopieren nebeneinander */
 .share-url { display: flex; gap: 8px; align-items: stretch; }
 .share-url-input { flex: 1; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
 .share-url button { flex: 0 0 auto; }
 .share-cols { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.board-members { margin: 4px 0 12px; }
+.board-members-title { font-weight: 600; margin-bottom: 4px; font-size: 14px; }
 .share-cols label.inline { font-size: 13px; }
 
 dialog input, dialog textarea, dialog select {
@@ -344,7 +371,7 @@ dialog .row { display: flex; gap: 10px; flex-wrap: wrap; }
 
 dialog footer { display: flex; gap: 8px; margin-top: 8px; }
 
-.hint { font-weight: 400; color: var(--muted); }
+.hint { font-weight: 400; color: var(--muted); font-size: 13px; }
 
 .chip-pick { display: flex; flex-wrap: wrap; gap: 6px; }
 
@@ -359,6 +386,10 @@ dialog footer { display: flex; gap: 8px; margin-top: 8px; }
 }
 
 .pick-chip.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.req-star { color: var(--danger); margin-left: 2px; font-weight: 700; }
+.req-cap { display: inline-flex; align-items: baseline; align-self: flex-start; }
+.req-legend { color: var(--danger); font-size: 10px; margin: 6px 0 0; }
+.req-proxy { display: block; width: 100%; height: 1px; margin: -1px 0 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
 
 .color-pick { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 
@@ -508,10 +539,24 @@ dialog footer { display: flex; gap: 8px; margin-top: 8px; }
     padding: 6px;
 }
 
-.col-edit .drag { cursor: grab; color: var(--muted); padding: 0 4px; }
+.col-edit .drag { cursor: grab; color: var(--muted); flex: 0 0 18px; text-align: center; padding: 0; }
 .col-edit input[type="text"] { flex: 1; min-width: 80px; }
-.col-edit input[type="number"] { width: 60px; }
-.col-edit label.inline { flex-direction: row; align-items: center; gap: 4px; white-space: nowrap; }
+.col-edit input[type="number"] { flex: 0 0 60px; width: 60px; text-align: center; appearance: textfield; -moz-appearance: textfield; }
+.col-edit input[type="number"]::-webkit-outer-spin-button,
+.col-edit input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.col-edit .col-chk { display: flex; justify-content: center; align-items: center; margin: 0; }
+.col-edit .col-chk.c-new { flex: 0 0 58px; }
+.col-edit .col-chk.c-done { flex: 0 0 76px; }
+.col-edit .rm { flex: 0 0 30px; width: 30px; padding: 2px 0; }
+.col-head { display: flex; gap: 6px; align-items: flex-end; padding: 0 7px 4px; margin-bottom: -6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.col-head .h-drag { flex: 0 0 18px; }
+.col-head .h-name { flex: 1; min-width: 80px; }
+.col-head .h-num { flex: 0 0 60px; text-align: center; }
+.col-head .h-new { flex: 0 0 58px; text-align: center; }
+.col-head .h-done { flex: 0 0 76px; text-align: center; }
+.col-head .h-rm { flex: 0 0 30px; }
+.col-head span[title] { cursor: help; }
+.col-more { font-size: 12px; color: var(--muted); padding: 4px 2px 2px; }
 
 /* Label-Verwaltung (Board-Einstellungen) */
 .label-edit {
@@ -559,9 +604,59 @@ button.mini {
 /* ------------------------------------------------------------ Mobil */
 
 @media (max-width: 600px) {
-    .column { min-width: 84vw; width: 84vw; }
-    #boardSelect { max-width: 34vw; }
+    /* Spalten untereinander statt nebeneinander (Akkordeon) */
+    #board { flex-direction: column; overflow-x: hidden; overflow-y: auto; }
+    .column { min-width: 0; width: 100%; max-width: none; flex: none; max-height: none; }
+    .cards { overflow-y: visible; }
+    .column-head { cursor: pointer; user-select: none; }
+    .column.collapsed .cards, .column.collapsed .column-foot { display: none; }
+    html, body { overflow-x: hidden; max-width: 100%; }
+    #boardSelect { max-width: 40vw; }
+    /* Benutzer-Chips umbrechen statt horizontal ueberlaufen */
+    #userChips { flex-wrap: wrap; }
+
+    /* Dialoge vollfl\u00e4chig, Felder gestapelt, Footer sticky */
+    /* Dialoge als bodennahes Vollflaechen-Sheet: volle Breite, Hoehe = Inhalt (max. Schirm),
+       nur der Inhalt scrollt, Footer klebt unten, Buttons gleich gross nebeneinander */
+    dialog[open] {
+        width: 100%; max-width: 100%;
+        height: 100dvh; max-height: 100dvh;           /* immer gleiche, volle Hoehe */
+        margin: 0; inset: 0;
+        padding: 0; border: none; border-radius: 0;
+        display: flex; flex-direction: column;
+        overflow: hidden;                             /* nichts ragt seitlich heraus */
+    }
+    #cardForm, #boardDialogBody, #shareBody {
+        margin: 0; padding: 14px 12px 0;
+        display: flex; flex-direction: column;
+        overflow-y: auto; -webkit-overflow-scrolling: touch;
+        min-height: 0; flex: 1 1 auto; max-height: none;
+    }
+    dialog .row { flex-direction: column; }
+    .share-url { flex-direction: column; }
+    .tab-panels { height: auto; max-height: none; overflow: visible; }
+    .tabbar { position: sticky; top: 0; background: var(--surface); z-index: 3; }
+
+    /* Footer klebt unten, volle Breite, gleich grosse Buttons nebeneinander */
+    dialog footer {
+        position: sticky; bottom: 0; z-index: 2;
+        margin: auto -12px 0; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        background: var(--surface); border-top: 1px solid var(--border);
+        display: flex; gap: 8px; flex-wrap: nowrap;
+    }
+    dialog footer .spacer { display: none; }          /* kein Auseinanderdruecken auf Mobil */
+    dialog footer > button { flex: 1 1 0; min-width: 0; }
+
+    .col-chevron { display: inline !important; }      /* schlaegt die spaetere Basisregel */
 }
+
+/* Einklapp-Chevron im Spaltenkopf – nur auf schmalen Screens sichtbar */
+.col-chevron { display: none; font-size: 12px; color: var(--muted); }
+
+/* Hervorgehobene Karte (Benachrichtigungs-Link-Ziel \u201eBoard\u201c) */
+.card-focus { outline: 2px solid var(--accent); }
+.card-focus { animation: card-pulse 1s ease-in-out 2; }
+@keyframes card-pulse { 0%, 100% { box-shadow: var(--shadow); } 50% { box-shadow: 0 0 0 4px var(--accent); } }
 
 .col-toggle {
     margin-left: auto;
@@ -574,7 +669,8 @@ button.mini {
     opacity: 0.85;
 }
 .col-toggle:hover { background: none; opacity: 1; }
-.col-toggle.off { opacity: 0.3; filter: grayscale(1); }
+.col-toggle.off { opacity: 0.55; }
+.col-toggle svg { display: block; }
 
 /* Schnellablage-Ziele beim Ziehen einer Karte (unter der aufgenommenen Karte) */
 .quick-move {

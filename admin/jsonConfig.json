@@ -53,6 +53,22 @@
                     "label": { "en": "Accent color", "de": "Akzentfarbe" },
                     "sm": 6, "md": 3
                 },
+                "dateFormat": {
+                    "type": "text",
+                    "newLine": true,
+                    "label": { "en": "Date format", "de": "Datumsformat" },
+                    "help": { "en": "Empty = ioBroker system format. Tokens: D/DD day, M/MM month, MMM/MMMM month name, YY/YYYY year, ddd/dddd weekday (e.g. DD. MMMM YYYY)", "de": "Leer = ioBroker-Systemformat. Platzhalter: D/DD Tag, M/MM Monat, MMM/MMMM Monatsname, YY/YYYY Jahr, ddd/dddd Wochentag (z.B. DD. MMMM YYYY)" },
+                    "sm": 6, "md": 4
+                },
+                "timeFormat": {
+                    "type": "select",
+                    "label": { "en": "Time format", "de": "Uhrzeit-Format" },
+                    "options": [
+                        { "label": { "en": "24-hour (14:00)", "de": "24-Stunden (14:00)" }, "value": "24h" },
+                        { "label": { "en": "12-hour (2:00 PM)", "de": "12-Stunden (2:00 PM)" }, "value": "12h" }
+                    ],
+                    "sm": 6, "md": 3
+                },
                 "customCss": {
                     "type": "text",
                     "multiline": true,
@@ -69,7 +85,7 @@
             "items": {
                 "_info": {
                     "type": "staticText",
-                    "text": { "en": "Users can be assigned to cards. No login — selection happens in the board UI.", "de": "Benutzer können Karten zugewiesen werden. Kein Login — die Auswahl erfolgt in der Board-Oberfläche." },
+                    "text": { "en": "Users can be assigned to cards. No login — the user chips in the board header act as a filter.", "de": "Benutzer können Karten zugewiesen werden. Kein Login — die Benutzer-Chips in der Board-Kopfzeile dienen als Filter." },
                     "sm": 12
                 },
                 "users": {
@@ -79,8 +95,7 @@
                     "items": [
                         { "type": "text", "attr": "name", "width": "10%", "title": { "en": "ID (lowercase)", "de": "ID (klein, ohne Umlaute)" }, "filter": false, "sort": false },
                         { "type": "text", "attr": "displayName", "width": "15%", "title": { "en": "Display name", "de": "Anzeigename" }, "filter": false, "sort": false },
-                        { "type": "text", "attr": "email", "width": "26%", "title": { "en": "Email", "de": "E-Mail" }, "filter": false, "sort": false },
-                        { "type": "color", "attr": "color", "width": "7%", "title": { "en": "Color", "de": "Farbe" } },
+                        { "type": "text", "attr": "email", "width": "33%", "title": { "en": "Email", "de": "E-Mail" }, "filter": false, "sort": false },
                         { "type": "checkbox", "attr": "notifyAssigned", "width": "7%", "title": { "en": "→ assigned", "de": "→ Zugew." }, "tooltip": { "en": "E-mail when a card is assigned to this user", "de": "E-Mail, wenn diesem Benutzer eine Karte zugewiesen wird" }, "filter": false, "sort": false },
                         { "type": "checkbox", "attr": "notifyDue", "width": "7%", "title": { "en": "→ due", "de": "→ Fällig" }, "tooltip": { "en": "E-mail when a card of this user is due/overdue", "de": "E-Mail, wenn eine Karte dieses Benutzers fällig/überfällig ist" }, "filter": false, "sort": false },
                         { "type": "checkbox", "attr": "notifyUpdated", "width": "7%", "title": { "en": "→ changed", "de": "→ Geänd." }, "tooltip": { "en": "E-mail when a card of this user is edited", "de": "E-Mail, wenn eine Karte dieses Benutzers bearbeitet wird" }, "filter": false, "sort": false },

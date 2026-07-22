@@ -11,7 +11,7 @@ const { Server } = require('./lib/server');
 
 class Kanban extends utils.Adapter {
     constructor(options) {
-        super({ ...options, name: 'kanban' });
+        super({ ...options, name: 'kanban', useFormatDate: true });
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
         this.on('message', this.onMessage.bind(this));

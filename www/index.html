@@ -30,7 +30,8 @@
 <dialog id="cardDialog">
     <form method="dialog" id="cardForm">
         <h3 id="cardDialogTitle">Karte</h3>
-        <label data-i18n="card.title">Titel
+        <label>
+            <span class="req-cap"><span data-i18n="card.title">Titel</span><span class="req-star" aria-hidden="true">*</span></span>
             <input type="text" name="title" required autocomplete="off">
         </label>
         <label><span data-i18n="card.description">Beschreibung</span> <span class="hint" data-i18n="card.markdown">(Markdown)</span>
@@ -58,8 +59,9 @@
                 <select name="columnId"></select>
             </label>
         </div>
-        <label data-i18n="card.assignees">Zuständig</label>
+        <label><span class="req-cap"><span data-i18n="card.assignees">Zuständig</span><span class="req-star" aria-hidden="true">*</span></span></label>
         <div id="assigneePick" class="chip-pick"></div>
+        <input id="assigneeValidity" class="req-proxy" tabindex="-1" aria-hidden="true">
         <label data-i18n="card.labels">Labels</label>
         <div id="labelPick" class="chip-pick"></div>
         <div class="row">
@@ -76,9 +78,8 @@
         <label class="inline" data-i18n-title="card.calendarInviteTitle">
             <input type="checkbox" name="calendarInvite"> <span data-i18n="card.calendarInvite">Kalender-Einladung (.ics) an Benachrichtigung anhängen</span>
         </label>
-        <label data-i18n="card.recurrence">Wiederholung</label>
         <div class="row">
-            <label data-i18n="rec.rhythm">Rhythmus
+            <label data-i18n="card.recurrence">Wiederholung
                 <select name="recType" id="recType">
                     <option value="none" data-i18n="rec.none">Keine</option>
                     <option value="daily" data-i18n="rec.daily">Täglich</option>
@@ -124,6 +125,7 @@
         <label data-i18n="card.checklist">Checkliste</label>
         <div id="checklistEdit"></div>
         <button type="button" id="addCheckItem" class="linkbtn" data-i18n="card.addCheckItem">+ Punkt hinzufügen</button>
+        <p class="req-legend"><span class="req-star" aria-hidden="true">*</span> <span data-i18n="card.requiredLegend">Pflichtfeld</span></p>
         <footer>
             <button type="button" id="deleteCardBtn" class="danger" hidden data-i18n="card.delete">Löschen</button>
             <span class="spacer"></span>

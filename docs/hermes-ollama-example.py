@@ -17,7 +17,7 @@ import requests
 # ---- Konfiguration -------------------------------------------------------
 OLLAMA_URL = "http://localhost:11434/api/chat"      # Ollama auf demselben Host
 MODEL      = "hermes3"                                # tool-fähiges Modell
-KANBAN_URL = "http://172.30.0.40:8095/webhook/d686e6e0e5c57ab90e5173c11139ed8d/action"
+KANBAN_URL = "http://192.168.1.10:8095/webhook/DEIN_INBOUND_TOKEN/action"
 
 SYSTEM_PROMPT = (
     "Du bist ein Assistent, der ein Kanban-Board verwaltet. "

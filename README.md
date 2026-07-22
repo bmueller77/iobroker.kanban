@@ -29,16 +29,16 @@ Then create an instance `kanban.0` and open the web UI: `http://<host>:8095/`
 ## Features
 
 - **Own web server** (default port 8095) — the web UI is served directly by the adapter; no `iobroker upload` needed for UI updates
-- **Multiple boards** with freely configurable columns (name, order, WIP limit, "done" flag)
+- **Multiple boards** with freely configurable columns (name, order, display limit, WIP limit, "new"/"done" flags)
 - **Cards** with title, Markdown description, assignees, due date (optionally with time), labels, color, priority, checklist, link, location and calendar invite
 - **Recurring tasks** (daily/weekly/monthly/yearly, n-th weekday, n-th working day incl. public-holiday calculation)
 - **Drag & drop** (mouse + touch), live sync across all open views via WebSocket (polling fallback)
-- **Multi-user without login**: user registry in the admin config; active user chosen in the UI or via URL parameter
+- **Multi-user without login**: user registry in the admin config, assignable members per board; the header chips act as a saved per-board person filter
 - **E-mail notifications** via `iobroker.email` on assignment, due date and card events (toggleable per event type and per user)
 - **Webhooks inbound** (token-secured) and **outbound** (JSON POST on events)
 - **Share view**: dialog to build filtered, embeddable links
 - **iframe-friendly** (no frame headers) with `?embed=1` mode for Lovelace & co.
-- **Multilingual** (de, en, fr, nl, it), theming (light/dark/auto, accent color, custom CSS)
+- **Multilingual** (de, en, fr, nl, it), configurable **date & time format** per instance (moment/Day.js tokens with localised month/weekday names, 12h/24h), theming (light/dark/auto, accent color, custom CSS)
 
 ## Web UI / URL parameters
 
@@ -47,8 +47,7 @@ Then create an instance `kanban.0` and open the web UI: `http://<host>:8095/`
 | Parameter | Effect |
 |---|---|
 | `board=<id>` | preselect a board |
-| `user=<name>` | set the active user |
-| `filter=1` | show only the active user's cards |
+| `users=<name,name>` | person filter: show only cards assigned to these users (`user=<name>` = single-user short form) |
 | `label=<id,id>` | label **blacklist**: hide cards with these labels |
 | `columns=<id,id>` | show only these columns |
 | `doneLimit=N` | in done columns show only N cards (`0` = none, omit = all) |
@@ -80,6 +79,7 @@ For integrations on the local network (the same API the web UI uses). **Reading*
 | PATCH | `/api/boards/:id/cards/:cardId` | update a card partially |
 | POST | `/api/boards/:id/cards/:cardId/move` | `{columnId, order?}` |
 | DELETE | `/api/boards/:id/cards/:cardId` | delete a card |
+| PATCH | `/api/users/:name` | set a user colour (applied at runtime, no restart) |
 
 ## Webhooks & commands
 
@@ -122,10 +122,26 @@ From **0.1.1**: token-secured write API, Markdown preview sanitized with DOMPuri
 
 ## Changelog
 
+- **0.2.0**
+  - Mobile: columns stack & collapse (accordion); full-screen dialogs with a fixed action bar (equal-width buttons), no sideways scrolling
+  - Assignable **users per board** — managed centrally under *Settings → Boards*; each board needs at least one member
+  - Header user chips are now a **saved, per-board filter** (multi-select; tap to show only those users' cards; all active by default). The old "my cards" button was removed
+  - **User colours** are edited in the web UI (*Settings → Users*), applied instantly **without an adapter restart** (previously in the instance config)
+  - **Colour ring** around avatars (cards always, chips when selected), 50% larger avatars, and **automatic black/white text** on labels & avatars (WCAG luminance) for readability
+  - Per-board **notification link target**: board view (highlight card), card editor, or a fixed custom URL
+  - **Configurable date format** per instance (moment/Day.js tokens incl. localised month/weekday names) plus a 12h/24h **time format**; empty date format = ioBroker system format
+  - **At least one assignee is required** per card in the UI — required fields are marked with a red `*`; the validation message follows the board language
+  - **Per-column display limit** ("Max"): show only the first N cards, the rest collapse into a `+X more` hint
+  - Column settings gained an aligned header row (Title · Max · WIP · New · Done) with explanatory tooltips
+  - Material Design icons throughout (toolbar, card badges, link types) — no more emoji glyphs
 - **0.1.3** — Fix: the column task count now respects the active person/label filter (previously showed the column total)
 - **0.1.2** — "Share view": `doneLimit` distinguishes empty=all / 0=none; label filter is now a blacklist (new labels stay visible)
 - **0.1.1** — Security: token-protected write API, sanitized Markdown preview, CSP, safe link schemes
 - **0.1.0** — Initial release
+
+## Acknowledgements
+
+Built with the support of Anthropic's **Claude** — in particular for the translations of the web UI and this documentation (English, French, Dutch, Italian), as well as testing and documentation review.
 
 ## License
 

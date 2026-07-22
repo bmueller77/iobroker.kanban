@@ -1,6 +1,6 @@
 {
   "_comment": "Werkzeug-Definitionen für einen LLM-Agenten (Hermes), um das ioBroker-Kanban-Board zu lesen und zu schreiben. Alle Tools rufen POST http://<HOST>:8095/webhook/<TOKEN>/action mit dem jeweiligen Body auf. Feldnamen-Fallstricke: Karten-ID = cardId ODER id; Spalte = columnId ODER column; Board = board ODER boardId.",
-  "endpoint": "POST http://172.30.0.40:8095/webhook/<TOKEN>/action",
+  "endpoint": "POST http://192.168.1.10:8095/webhook/<TOKEN>/action",
   "tools": [
     {
       "name": "kanban_get_boards",

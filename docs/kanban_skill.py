@@ -7,7 +7,7 @@ Zwei Nutzungsarten:
 
   1) Direkt aus Agenten-Code:
        from kanban_skill import KanbanSkill
-       kb = KanbanSkill("http://172.30.0.40:8095", "d686e6e0e5c57ab90e5173c11139ed8d")
+       kb = KanbanSkill("http://192.168.1.10:8095", "DEIN_INBOUND_TOKEN")
        board = kb.get_board("familie")
        kb.add_card("familie", "Müll rausbringen", due="2026-07-15", assignees=["bjoern"])
 
@@ -42,7 +42,7 @@ class KanbanSkill:
     )
 
     def __init__(self, base_url, token, timeout=15):
-        """base_url z.B. 'http://172.30.0.40:8095', token = Inbound-Token des Adapters."""
+        """base_url z.B. 'http://192.168.1.10:8095', token = Inbound-Token des Adapters."""
         self.endpoint = f"{base_url.rstrip('/')}/webhook/{token}/action"
         self.timeout = timeout
 
@@ -166,7 +166,7 @@ class KanbanSkill:
 # Mini-Selbsttest:  python3 kanban_skill.py <base_url> <token> [board]
 if __name__ == "__main__":
     import sys
-    base = sys.argv[1] if len(sys.argv) > 1 else "http://172.30.0.40:8095"
+    base = sys.argv[1] if len(sys.argv) > 1 else "http://192.168.1.10:8095"
     tok = sys.argv[2] if len(sys.argv) > 2 else ""
     kb = KanbanSkill(base, tok)
     print("Tools:", [t["function"]["name"] for t in kb.tools])
