@@ -77,7 +77,12 @@
         "en": "Initial release",
         "de": "Erstveröffentlichung"
       }
-    }
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=7.8.23"
+      }
+    ]
   },
   "native": {
     "port": 8095,
