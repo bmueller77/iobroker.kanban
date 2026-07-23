@@ -21,7 +21,7 @@
     "tasks"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.2.2",
