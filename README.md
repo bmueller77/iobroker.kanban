@@ -122,6 +122,9 @@ From **0.1.1**: token-secured write API, Markdown preview sanitized with DOMPuri
 
 ## Changelog
 
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
+
 - **0.2.0**
   - Mobile: columns stack & collapse (accordion); full-screen dialogs with a fixed action bar (equal-width buttons), no sideways scrolling
   - Assignable **users per board** — managed centrally under *Settings → Boards*; each board needs at least one member
