@@ -139,6 +139,8 @@ From **0.1.1**: token-secured write API, Markdown preview sanitized with DOMPuri
 - **0.1.1** — Security: token-protected write API, sanitized Markdown preview, CSP, safe link schemes
 - **0.1.0** — Initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## Acknowledgements
 
 Built with the support of Anthropic's **Claude** — in particular for the translations of the web UI and this documentation (English, French, Dutch, Italian), as well as testing and documentation review.
